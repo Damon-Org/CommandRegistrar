@@ -26,6 +26,10 @@ export default class EventModule extends EventEmitter {
         return this._m.log;
     }
 
+    get modules() {
+        return this._m.modules;
+    }
+
     get servers() {
         return this._m.serverManager;
     }
@@ -52,12 +56,5 @@ export default class EventModule extends EventEmitter {
         else if (this.rawData) {
             Object.assign(this.rawData, object);
         }
-    }
-
-    /**
-     * @param {string} moduleName
-     */
-    getModule(moduleName) {
-        return this._m.modules.get(moduleName);
     }
 }
