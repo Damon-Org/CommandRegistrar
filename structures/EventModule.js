@@ -31,7 +31,7 @@ export default class EventModule extends EventEmitter {
     }
 
     get servers() {
-        return this._m.serverManager;
+        return this._m.servers;
     }
 
     get users() {
