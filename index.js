@@ -55,13 +55,13 @@ export default class CommandRegistrar extends EventModule {
 
                         if (this.output && !instance.hidden) {
                             if (parentBit.length == 0) {
-                                this.output[category].commands.push(instance.rawData);
+                                this.output[category].commands.push(instance.raw);
                             }
                             else {
                                 if (!this.output[category].children) this.output[category].children = {};
                                 if (!this.output[category].children[parentBit.trim()]) this.output[category].children[parentBit.trim()] = [];
 
-                                this.output[category].children[parentBit.trim()].push(instance.rawData);
+                                this.output[category].children[parentBit.trim()].push(instance.raw);
                             }
                         }
                         else if (instance.hidden) {
