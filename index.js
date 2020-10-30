@@ -10,8 +10,7 @@ export default class CommandRegistrar extends EventModule {
         super(main);
 
         this.register(CommandRegistrar, {
-            name: 'commandRegistrar',
-            scope: 'global'
+            name: 'commandRegistrar'
         });
     }
 
@@ -85,7 +84,7 @@ export default class CommandRegistrar extends EventModule {
         }
     }
 
-    async setup() {
+    async init() {
         const commands = importDir(`${this._m.root}/src/commands/`, { recurse: true, noCache: true });
 
         this.commandList = new CommandList();
