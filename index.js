@@ -1,7 +1,7 @@
 import EventModule from './structures/EventModule.js'
 import CommandList from './structures/CommandList.js'
 import fs from 'fs'
-import { resolve } from 'path'
+import { dirname, resolve } from 'path'
 import ImportDir from '@yimura/import-dir'
 
 export default class CommandRegistrar extends EventModule {
@@ -29,7 +29,7 @@ export default class CommandRegistrar extends EventModule {
      * @param {boolean} [output = true] If the commands should be included in the generation of commands.json
      */
     async registerCommands(groupName, modulePath, output = true) {
-        modulePath = modulePath.replace('file://', '');
+        modulePath = dirname(modulePath).replace('file://', '');
 
         const commands = ImportDir(modulePath + '/commands/', { recurse: true, noCache: true });
 
