@@ -1,7 +1,8 @@
 import EventModule from './structures/EventModule.js'
 import CommandList from './structures/CommandList.js'
 import fs from 'fs'
-import importDir from '@yimura/import-dir'
+import { resolve } from 'path'
+import ImportDir from '@yimura/import-dir'
 
 export default class CommandRegistrar extends EventModule {
     commandList = new CommandList();
@@ -19,6 +20,20 @@ export default class CommandRegistrar extends EventModule {
      */
     get(commandName) {
         return this.commandList.get(commandName);
+    }
+
+    /**
+     * Register commands from a module
+     * @param {string} groupName The name to group the commands under
+     * @param {string} modulePath Path to the root of the module (you should have a folder called "commands")
+     * @param {boolean} [output = true] If the commands should be included in the generation of commands.json
+     */
+    async registerCommands(groupName, modulePath, output = true) {
+        modulePath = modulePath.replace('file://', '');
+
+        const commands = ImportDir(modulePath + '/commands/', { recurse: true, noCache: true });
+
+        await this._recursiveRegister(groupName, commands);
     }
 
     /**
@@ -85,7 +100,7 @@ export default class CommandRegistrar extends EventModule {
     }
 
     async init() {
-        const commands = importDir(`${this._m.root}/src/commands/`, { recurse: true, noCache: true });
+        const commands = ImportDir(resolve(`./src/commands/`), { recurse: true, noCache: true });
 
         this.commandList = new CommandList();
         if (this.config.development && this.config.generate_command_json) this.output = {};
@@ -101,13 +116,15 @@ export default class CommandRegistrar extends EventModule {
         this.log.info('COMMANDS', `Mapping of commands done with ${this.commandList.registered} unique commands registered, ${this.commandList.size - this.commandList.registered} aliases registered.`);
 
         if (this.output) {
-            fs.writeFile(`${this._m.root}/data/commands.json`, JSON.stringify(this.output, null, '    '), { flag: 'w+' }, (err) => {
+            fs.writeFile(resolve(`./data/commands.json`), JSON.stringify(this.output, null, '    '), { flag: 'w+' }, (err) => {
                 if (err) {
                     throw err;
                 }
 
                 this.log.info('COMMANDS', 'Generated new "data/commands.json" with the mapped commands.');
             });
+
+            delete this.output;
         }
 
         this.globalStorage.set('prefix', this.config.development ? this.config.default_prefix.dev : this.config.default_prefix.prod);
