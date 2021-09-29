@@ -4,6 +4,8 @@ import fs from 'fs'
 import { dirname, resolve } from 'path'
 import ImportDir from '@yimura/import-dir'
 
+import BaseCommand from './structures/commands/BaseCommand.js'
+
 export default class CommandRegistrar extends EventModule {
     commandList = new CommandList();
 
@@ -12,6 +14,10 @@ export default class CommandRegistrar extends EventModule {
 
         this.register(CommandRegistrar, {
             name: 'commandRegistrar'
+        });
+
+        Object.assign(this, {
+           BaseCommand
         });
     }
 
@@ -90,11 +96,11 @@ export default class CommandRegistrar extends EventModule {
     }
 
     /**
-     * @param {Object} commanObj 
+     * @param {Object} commanObj
      */
     _updateOutput(category, commanObj) {
         if (!this.output[category]) this.output[category] = [];
-                            
+
         this.output[category].push(commanObj);
 
         clearTimeout(this.writeTimeout);
