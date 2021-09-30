@@ -252,39 +252,6 @@ export default class BaseCommand extends Map {
     }
 
     /**
-     * Checks if the bot has the required permissions to properly execute the command it was asked to execute
-     * @private
-     */
-    _hasSelfPermissions() {
-        if (!this.msgObj.guild || !this.serverMember) return true;
-        if (!this.self_permission) return true;
-
-        if (this.self_permission['channel'] || this.self_permission['text_channel'] || this.self_permission['voice_channel']) {
-            if (this.voiceChannel && (this.self_permission['channel'] || this.self_permission['voice_channel']) && !this.voiceChannel.permissionsFor(this._m.user.id).has(this.self_permission['channel'] || this.self_permission['voice_channel'])) {
-                const embed = new MessageEmbed()
-                    .setTitle("❌ Missing Permissions ❌")
-                    .setDescription(`**__I__ don't have the __${this.self_permission['channel'] || this.self_permission['voice_channel']}__ permission**\nfor voice channel you're in.`)
-                    .setColor("#ffff00")
-                this.textChannel.send({embeds: [embed]});
-
-                return false;
-            }
-
-            if ((this.self_permission['channel'] || this.self_permission['voice_channel']) && !this.textChannel.permissionsFor(this._m.user.id).has(this.self_permission['channel'] || this.self_permission['text_channel'])) {
-                const embed = new MessageEmbed()
-                    .setTitle("❌ Missing Permissions ❌")
-                    .setDescription(`**__I__ don't have the __${this.self_permission['channel'] || this.self_permission['text_channel']}__ permission**\nfor this text channel.`)
-                    .setColor("#ffff00")
-                this.textChannel.send({embeds: [embed]});
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * If the command has additional permissions to check and loop throught them
      * @private
      */
@@ -354,6 +321,39 @@ export default class BaseCommand extends Map {
         }
 
         return result;
+    }
+
+    /**
+     * Checks if the bot has the required permissions to properly execute the command it was asked to execute
+     * @private
+     */
+    _hasSelfPermissions() {
+        if (!this.msgObj.guild || !this.serverMember) return true;
+        if (!this.self_permission) return true;
+
+        if (this.self_permission['channel'] || this.self_permission['text_channel'] || this.self_permission['voice_channel']) {
+            if (this.voiceChannel && (this.self_permission['channel'] || this.self_permission['voice_channel']) && !this.voiceChannel.permissionsFor(this._m.user.id).has(this.self_permission['channel'] || this.self_permission['voice_channel'])) {
+                const embed = new MessageEmbed()
+                    .setTitle("❌ Missing Permissions ❌")
+                    .setDescription(`**__I__ don't have the __${this.self_permission['channel'] || this.self_permission['voice_channel']}__ permission**\nfor voice channel you're in.`)
+                    .setColor("#ffff00")
+                this.textChannel.send({embeds: [embed]});
+
+                return false;
+            }
+
+            if ((this.self_permission['channel'] || this.self_permission['voice_channel']) && !this.textChannel.permissionsFor(this._m.user.id).has(this.self_permission['channel'] || this.self_permission['text_channel'])) {
+                const embed = new MessageEmbed()
+                    .setTitle("❌ Missing Permissions ❌")
+                    .setDescription(`**__I__ don't have the __${this.self_permission['channel'] || this.self_permission['text_channel']}__ permission**\nfor this text channel.`)
+                    .setColor("#ffff00")
+                this.textChannel.send({embeds: [embed]});
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
