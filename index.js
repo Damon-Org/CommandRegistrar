@@ -40,6 +40,24 @@ export default class CommandRegistrar extends EventModule {
         const commands = ImportDir(modulePath + '/commands/', { recurse: true, noCache: true });
 
         await this._recursiveRegister(groupName, commands);
+
+        this._awaitFullRegistration();
+    }
+
+    /**
+     * Waits for all submodules to register their commands
+     * @private
+     */
+    _awaitFullRegistration() {
+        clearTimeout(this.waitTimeout);
+
+        this.waitTimeout = setTimeout(() => {
+            this.log.info('COMMANDS', `Mapping of commands done with ${this.commandList.registered} unique commands registered, ${this.commandList.size - this.commandList.registered} aliases registered.`);
+
+            this._updateOutput();
+
+            this.emit('ready');
+        }, 100);
     }
 
     /**
@@ -72,7 +90,9 @@ export default class CommandRegistrar extends EventModule {
                         this.commandList.set(instance.name, instance);
 
                         if (this.output && !instance.hidden) {
-                            this._updateOutput(category, instance.raw);
+                            if (!this.output[category]) this.output[category] = [];
+
+                            this.output[category].push(instance.raw);
                         }
                         else if (instance.hidden) {
                             this.log.info('COMMANDS', `Command hidden: "${instance.name}"`);
@@ -96,23 +116,17 @@ export default class CommandRegistrar extends EventModule {
     }
 
     /**
-     * @param {Object} commanObj
+     * Writes all the command information to data/commands.json
+     * @private
      */
-    _updateOutput(category, commanObj) {
-        if (!this.output[category]) this.output[category] = [];
+    _updateOutput() {
+        fs.writeFile(resolve(`./data/commands.json`), JSON.stringify(this.output, null, '    '), { flag: 'w+' }, (err) => {
+            if (err) {
+                throw err;
+            }
 
-        this.output[category].push(commanObj);
-
-        clearTimeout(this.writeTimeout);
-        this.writeTimeout = setTimeout(() => {
-            fs.writeFile(resolve(`./data/commands.json`), JSON.stringify(this.output, null, '    '), { flag: 'w+' }, (err) => {
-                if (err) {
-                    throw err;
-                }
-
-                this.log.info('COMMANDS', 'Generated new "data/commands.json" with the mapped commands.');
-            });
-        }, 500);
+            this.log.info('COMMANDS', 'Generated new "data/commands.json" with the mapped commands.');
+        });
     }
 
     async init() {
@@ -125,11 +139,9 @@ export default class CommandRegistrar extends EventModule {
             if (commands.hasOwnProperty(categoryName))
                 await this._recursiveRegister(categoryName, commands[categoryName]);
 
-        this.log.info('COMMANDS', `Mapping of commands done with ${this.commandList.registered} unique commands registered, ${this.commandList.size - this.commandList.registered} aliases registered.`);
+        this._awaitFullRegistration();
 
         this.globalStorage.set('prefix', this.config.development ? this.config.default_prefix.dev : this.config.default_prefix.prod);
-
-        this.emit('ready');
 
         return true;
     }
