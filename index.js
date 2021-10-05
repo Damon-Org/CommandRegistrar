@@ -54,7 +54,8 @@ export default class CommandRegistrar extends EventModule {
         this.waitTimeout = setTimeout(() => {
             this.log.info('COMMANDS', `Mapping of commands done with ${this.commandList.registered} unique commands registered, ${this.commandList.size - this.commandList.registered} aliases registered.`);
 
-            this._updateOutput();
+            if (this.config.generate_command_json)
+                this._updateOutput();
 
             this.emit('ready');
         }, 100);
@@ -133,7 +134,7 @@ export default class CommandRegistrar extends EventModule {
         const commands = ImportDir(resolve(`./src/commands/`), { recurse: true, noCache: true });
 
         this.commandList = new CommandList();
-        if (this.config.development && this.config.generate_command_json) this.output = {};
+        if (this.config.generate_command_json) this.output = {};
 
         for (const categoryName in commands)
             if (commands.hasOwnProperty(categoryName))
