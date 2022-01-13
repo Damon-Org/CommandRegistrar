@@ -140,9 +140,10 @@ export default class BaseCommand extends Map {
      * @param {boolean} mentioned
      */
     async exec(msgObj, args, command, mentioned) {
+        this._msg = msgObj;
+
         if (mentioned) this._removeBotMention();
 
-        this._msg = msgObj;
         this._parseArguments(args);
         if (!this._checkArguments()) return false;
 
