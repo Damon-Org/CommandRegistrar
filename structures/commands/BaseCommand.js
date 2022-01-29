@@ -93,20 +93,8 @@ export default class BaseCommand extends Map {
     }
 
     send(p1, p2, reply = false) {
-        if (!this.textChannel.permissionsFor(this._m.user.id).has(['SEND_MESSAGES', 'ATTACH_FILES'])) {
-            const guild = this.textChannel.guild;
-            const embed = new Discord.MessageEmbed()
-                    .setAuthor(guild.name, guild.iconURL({size: 64}), `https://discordapp.com/channels/${guild.id}/${this.textChannel.id}`)
-                    .setTitle('Missing permission')
-                    .setDescription('I do not have permission to send messages or attach files.');
-
-            this.dm(embed);
-            return null;
-        }
-
-        if (reply) {
+        if (reply)
             return this._msg.reply(p1, p2);
-        }
         return this.textChannel.send(p1, p2);
     }
 
